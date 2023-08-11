@@ -159,7 +159,7 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-clearml.conf
+configs/clearml.conf
 test_media/
 yolov8m_spot_gazer/
 sandbox/
@@ -168,5 +168,5 @@ database_mock/
 unsuitable_systems/
 COCO_archives/**.json
 COCO_archives/**.zip
-image_for_markup/**.jpg
+images_for_markup/**.jpg
 Notes.md
