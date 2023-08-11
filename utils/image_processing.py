@@ -2,11 +2,30 @@ from os.path import join as join_path
 
 import cv2
 import numpy as np
+from ultralytics.yolo.data import load_inference_source
 
 from .tools import parse_time
 
 
-def extract_video_frame(video_path: str, target_time: tuple[int, int, int], image_name: str) -> None:
+def create_mask(frame: np.ndarray, figure_coords: list[list], mask_only: bool = True) -> np.ndarray:
+    """
+    The method creates a black mask around the figure whose coordinates were passed.
+
+    If the parameter `mask_only` is False, the method returns the mask glued with an image.
+    """
+    mask = np.zeros_like(frame)
+
+    arrays = []
+    for coord in figure_coords:
+        arrays.append(np.array(coord, np.int32))
+    cv2.fillPoly(mask, pts=arrays, color=(255, 255, 255))
+
+    if mask_only:
+        return mask
+    return cv2.bitwise_and(frame, mask)  # Glue the mask and the original image
+
+
+def retrieve_frame_by_time(video_path: str, target_time: tuple[int, int, int], image_name: str) -> None:
     """
     :param target_time: (hour, minute, second)
     """
@@ -41,16 +60,22 @@ def extract_video_frame(video_path: str, target_time: tuple[int, int, int], imag
     cap.release()
 
 
-def retrieve_the_latest_frame(source: str, image_name_to_save: str = "") -> np.ndarray:
+def retrieve_frame_from_stream(source: str, image_name_to_save: str | None = None) -> np.ndarray:
     """Retrieve the latest frame from the video stream
 
-    If the `image name_to_save` parameter is defined, a frame will be saved to the `image_for_markup` folder
+    If the `image name_to_save` parameter is defined, a frame will be saved to the `images_for_markup` folder
     """
-    cap = cv2.VideoCapture(source)
-    _, frame = cap.read()
-    cap.release()
+    for batch in load_inference_source(source):
+        _, frame, _, _ = batch
+        if image_name_to_save:
+            cv2.imwrite(join_path("images_for_markup", f"{image_name_to_save}.jpg"), frame[0])
+        return frame
 
-    if image_name_to_save:
-        cv2.imwrite(join_path("image_for_markup", f"{image_name_to_save}.jpg"), frame)
 
-    return frame
+if __name__ == "__main__":
+    # retrieve_frame_by_time("test_media/parking_video_1.mp4", (0, 0, 5), "v3")
+    # retrieve_frame_from_stream("test_media/parking_video_1.mp4", "parking_video_1")
+    retrieve_frame_from_stream(
+        "https://www.youtube.com/watch?v=mpwfjhmyEzw&ab_channel=NordicTelecomLan%C5%A1kroun",
+        "YouType_stream",
+    )
