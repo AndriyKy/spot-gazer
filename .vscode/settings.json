@@ -1,0 +1,40 @@
+{
+    "isort.args": [
+        "-rc",
+        "-sp .isort.cfg"
+    ],
+    "[python]": {
+        "editor.formatOnPaste": false,
+        "editor.codeActionsOnSave": {
+            "source.organizeImports": true
+        }
+    },
+    "python.testing.pytestArgs": [
+        "tests/"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true,
+    "python.testing.pytestPath": "python -m pytest",
+    "editor.formatOnType": true,
+    "editor.formatOnPaste": true,
+    "editor.formatOnSave": true,
+    "spellright.language": [
+        "en"
+    ],
+    "spellright.documentTypes": [
+        "markdown",
+        "latex",
+        "plaintext",
+        "python"
+    ],
+    "terminal.integrated.profiles.linux": {
+        "bash": {
+            "path": "bash",
+            "args": [
+                "-c",
+                "export `cat .env`; $SHELL"
+            ]
+        }
+    },
+    "terminal.integrated.defaultProfile.linux": "bash"
+}
