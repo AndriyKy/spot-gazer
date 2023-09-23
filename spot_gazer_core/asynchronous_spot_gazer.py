@@ -4,14 +4,13 @@ from pathlib import Path
 from typing import Any, Generator, NoReturn
 
 import numpy as np
+from configs.settings import TIME_ZONE, YOLOv8_PREDICTION_PARAMETERS
 from pendulum import now
 from torch import Tensor
 from ultralytics import YOLO
 from ultralytics.yolo.engine.results import Results
 from ultralytics.yolo.utils import DEFAULT_CFG, SETTINGS
 from ultralytics.yolo.v8.detect import DetectionPredictor
-
-from configs.settings import TIME_ZONE, YOLOv8_PREDICTION_PARAMETERS
 from utils import create_mask, logging
 
 SETTINGS.update({"sync": False})  # Prevent sync analytics and crashes with Ultralytics HUB (Google Analytics)
@@ -42,7 +41,10 @@ class SpotGazer(YOLO):
     """
 
     def __init__(
-        self, parking_lots: list[list[dict[str, Any]]], model: str | Path = "yolov8m_spot_gazer.pt", task="detect"
+        self,
+        parking_lots: list[list[dict[str, Any]]],
+        model: str | Path = "spot_gazer_core/yolov8m_spot_gazer.pt",
+        task="detect",
     ) -> None:
         super().__init__(model, task)
         # Manual predictor initialization
@@ -113,7 +115,7 @@ class SpotGazer(YOLO):
 if __name__ == "__main__":
     stream_1 = {
         "parking_lot_id": 1,
-        "stream_source": "test_media/parking_video_1.mp4",
+        "stream_source": "tests/test_media/parking_video_1.mp4",
         "processing_rate": 3,  # Process 1 frame every 3 seconds
         "parking_zone": [
             [[[0, 222]], [[633, 222]], [[635, 330]], [[3, 329]]],
@@ -123,7 +125,7 @@ if __name__ == "__main__":
     }
     stream_2 = {
         "parking_lot_id": 1,
-        "stream_source": "test_media/parking_video_2.mp4",
+        "stream_source": "tests/test_media/parking_video_2.mp4",
         "processing_rate": 5,
         "parking_zone": [
             [[[1, 256]], [[242, 76]], [[422, 117]], [[254, 288]], [[161, 359]], [[2, 308]]],
