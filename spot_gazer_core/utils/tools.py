@@ -7,4 +7,4 @@ def parse_time(hour: int = 0, minute: int = 0, second: int = 0, human_readable: 
 
     if human_readable:
         return pendulum.duration(hours=hour, minutes=minute, seconds=second)
-    return hour*3600 + minute*60 + second
+    return hour * 3600 + minute * 60 + second

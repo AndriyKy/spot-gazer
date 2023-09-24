@@ -74,7 +74,8 @@ class CoordinatesConverter:
             return self.export(converted_dict, to_file)
         else:
             for path in glob.glob(join_path(self.directory, "*.zip"), recursive=True):
-                _archive_name = path[len(self.directory) + 1:]
+                _archive_name = path[len(self.directory) + 1 :]
                 json_dict = self.read_json(_archive_name, file_in_archive)
                 converted_dict = self.convert(json_dict)
                 self.export(converted_dict, f"{_archive_name.split('.')[0]}.json")
+        return None
