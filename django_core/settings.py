@@ -30,7 +30,7 @@ SECRET_KEY = os.environ["SECRET_KEY"]
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True if os.environ["DEBUG"] == "True" else False
 
-ALLOWED_HOSTS = os.environ["DJANGO_ALLOWED_HOSTS"].split(" ")
+ALLOWED_HOSTS = os.environ["DJANGO_ALLOWED_HOSTS"].split("__")
 
 # Configure Internal IPs for Debug Toolbar.
 INTERNAL_IPS = ["127.0.0.1"]
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "livemap",
     "debug_toolbar",
 ]
 
