@@ -1,29 +1,35 @@
 {
-    "isort.args": [
-        "-rc",
-        "-sp .isort.cfg"
-    ],
+    "editor.formatOnPaste": true,
     "[python]": {
-        "editor.formatOnPaste": false,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
             "source.organizeImports": true
-        }
+        },
     },
+    "black-formatter.args": [
+        "--line-length=120",
+        "--target-version=py310"
+    ],
+    "flake8.args": [
+        "--max-line-length=120",
+        "--ignore=E203"
+    ],
+    "isort.args": [
+        "--profile=black",
+        "--line-length=120",
+        "--ca=true",
+        "--skip-gitignore=true"
+    ],
     "python.testing.pytestArgs": [
         "tests/"
     ],
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.testing.pytestPath": "python -m pytest",
-    "editor.formatOnType": true,
-    "editor.formatOnPaste": true,
-    "editor.formatOnSave": true,
-    "spellright.language": [
-        "en"
-    ],
-    "spellright.documentTypes": [
+    "cSpell.language": "en,uk",
+    "cSpell.enableFiletypes": [
         "markdown",
-        "latex",
         "plaintext",
         "python"
     ],
