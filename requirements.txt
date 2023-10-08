@@ -4,3 +4,4 @@ django-debug-toolbar==3.2.1
 pendulum==2.1.2
 pre-commit
 ultralytics==8.0.118
+pre-commit==3.4.0
