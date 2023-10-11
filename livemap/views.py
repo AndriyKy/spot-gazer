@@ -1,9 +1,36 @@
+from functools import lru_cache
+
 import folium
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.core.handlers.wsgi import WSGIRequest
+import requests  # type: ignore[import]
 
 from livemap.models import ParkingLot
+
+
+@lru_cache()
+def extract_client_ip_address(request: WSGIRequest) -> str | None:
+    req_headers = request.META
+    x_forwarded_for_value = req_headers.get("HTTP_X_FORWARDED_FOR")
+    if x_forwarded_for_value:
+        ip_addr = x_forwarded_for_value.split(",")[-1].strip()
+    else:
+        ip_addr = req_headers.get("REMOTE_ADDR")
+    return ip_addr
+
+
+@lru_cache()
+def fetch_geolocation(ip_address: str) -> tuple[float, float] | None:
+    response = requests.get(f"https://ipinfo.io/{ip_address}/json")
+
+    if response.status_code == 200:
+        data = response.json()
+        location = data.get("loc", "").split(",")
+        if len(location) == 2:
+            latitude, longitude = location
+            return float(latitude), float(longitude)
+    return None
 
 
 def _compose_html_table(parking: ParkingLot) -> folium.Popup:
@@ -39,7 +66,9 @@ def _compose_html_table(parking: ParkingLot) -> folium.Popup:
 
 def index(request: WSGIRequest) -> HttpResponse:
     parkings = ParkingLot.objects.all()
-    folium_map = folium.Map()
+    client_ip_address = extract_client_ip_address(request)
+    geolocation = fetch_geolocation(client_ip_address) if client_ip_address else None
+    folium_map = folium.Map(geolocation)
 
     for parking in parkings:
         popup = _compose_html_table(parking)
