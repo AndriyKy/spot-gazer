@@ -34,20 +34,27 @@ def fetch_geolocation(ip_address: str) -> tuple[float, float] | None:
 
 
 def _compose_html_table(parking: ParkingLot) -> folium.Popup:
-    last_occupancy_record = parking.occupancies.last()
     parking_popup = {
-        "Address": parking.address,
+        "Address": "<a href='https://www.google.com/maps/search/?api=1&query="
+        f"{parking.geolocation[0]},{parking.geolocation[1]}'>{parking.address}</a>",
         "Private": parking.get_is_private,
         "Free": parking.get_is_free,
         "Total spots": parking.total_spots,
         "Spots for disables": spots_for_disabled if (spots_for_disabled := parking.spots_for_disabled) else "",
-        "Free spots": parking.total_spots - last_occupancy_record.occupied_spots if last_occupancy_record else "",
+        "Free spots": parking.total_spots - parking.occupancies.latest().occupied_spots
+        if parking.occupancies.exists()
+        else "",
     }
-    table_html = """
+    table_html = f"""
     <table class="styled-table" style="width:100%">
         <thead>
             <tr>
-                <th colspan="2">Parking details</th>
+                <th colspan="2">
+                    Parking details - Live
+                    <a href='{parking.stream_sources.get().stream_source if parking.stream_sources.exists() else "/"}'>
+                        🔴
+                    </a>
+                </th>
             </tr>
         </thead>
     """
@@ -61,11 +68,13 @@ def _compose_html_table(parking: ParkingLot) -> folium.Popup:
     table_html += """
     </table>
     """
-    return folium.Popup(table_html, max_width=400)
+    return folium.Popup(table_html)
 
 
 def index(request: WSGIRequest) -> HttpResponse:
-    parkings = ParkingLot.objects.all()
+    parkings = ParkingLot.objects.select_related("address", "address__city", "address__city__country").prefetch_related(
+        "occupancies", "stream_sources"
+    )
     client_ip_address = extract_client_ip_address(request)
     geolocation = fetch_geolocation(client_ip_address) if client_ip_address else None
     folium_map = folium.Map(geolocation)
