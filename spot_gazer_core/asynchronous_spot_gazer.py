@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any, Generator
 
 import numpy as np
-from .configs.settings import YOLOv8_PREDICTION_PARAMETERS
+from .settings import YOLOv8_PREDICTION_PARAMETERS
 from torch import Tensor
 from ultralytics import YOLO
 from ultralytics.yolo.engine.results import Results
