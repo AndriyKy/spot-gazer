@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}
+  <title>Spot Gazer - Map</title>
+{% endblock %}
+
+{% block content %}
+  <div class="folium_wrapper">
+    {{ map|safe }}
+  </div>
+{% endblock %}
