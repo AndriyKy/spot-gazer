@@ -84,6 +84,7 @@ class VideoStreamSource(models.Model):
     parking_zone = models.JSONField(
         blank=True, null=True, help_text="An array in a format [[[[int, int]], [[int, int]], ...]]."
     )
+    is_active = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return f"{self.stream_source}, {self.parking_lot}"
@@ -109,6 +110,7 @@ class Occupancy(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
+        get_latest_by = "timestamp"
         verbose_name_plural = "Occupancy"
 
     def __str__(self) -> str:
