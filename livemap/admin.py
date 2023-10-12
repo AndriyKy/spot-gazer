@@ -22,7 +22,7 @@ class ParkingLotAdmin(admin.ModelAdmin):
 
 @admin.register(VideoStreamSource)
 class VideoStreamSourceAdmin(admin.ModelAdmin):
-    list_display = ("stream_source", "processing_rate", "parking_lot")
+    list_display = ("stream_source", "is_active", "processing_rate", "parking_lot")
 
 
 @admin.register(Occupancy)
