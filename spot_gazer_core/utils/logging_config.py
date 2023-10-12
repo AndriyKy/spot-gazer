@@ -2,7 +2,7 @@ import logging
 
 from colorlog import ColoredFormatter
 
-from configs.settings import CONSOLE_LOG_LEVEL, FILE_LOG_LEVEL
+from ..settings import CONSOLE_LOG_LEVEL, FILE_LOG_LEVEL
 
 # Create a logger with the root logger's name
 logger = logging.getLogger()
@@ -10,6 +10,7 @@ logger = logging.getLogger()
 # Set the logging level for the logger to the lowest level you want to log to the console
 logger.setLevel(CONSOLE_LOG_LEVEL)
 logging.getLogger("asyncio").setLevel(logging.WARNING)
+logging.getLogger("https").setLevel(logging.ERROR)
 logging.getLogger("urllib3.connectionpool").setLevel(logging.WARNING)
 
 datetime_format = "%d.%m.%Y %H:%M:%S"

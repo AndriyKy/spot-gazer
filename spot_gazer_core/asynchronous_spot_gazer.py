@@ -4,22 +4,26 @@ from pathlib import Path
 from typing import Any, Generator
 
 import numpy as np
-from configs.settings import TIME_ZONE, YOLOv8_PREDICTION_PARAMETERS
-from pendulum import now
+from .settings import YOLOv8_PREDICTION_PARAMETERS
 from torch import Tensor
 from ultralytics import YOLO
 from ultralytics.yolo.engine.results import Results
-from ultralytics.yolo.utils import DEFAULT_CFG, SETTINGS
+from ultralytics.yolo.utils import SETTINGS, callbacks
 from ultralytics.yolo.v8.detect import DetectionPredictor
-from utils import create_mask, logging
+from .utils import create_mask, logging
+import django
+
+django.setup()
+
+from livemap.models import Occupancy  # noqa: E402
 
 SETTINGS.update({"sync": False})  # Prevent sync analytics and crashes with Ultralytics HUB (Google Analytics)
 logger = logging.getLogger(__name__)
 
 
 class Interceptor(DetectionPredictor):
-    def __init__(self, cfg=DEFAULT_CFG, overrides=None, _callbacks=None) -> None:
-        super().__init__(cfg, overrides, _callbacks)
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
         self.parking_zone: Any | None = None
 
     def preprocess(self, image: Tensor | list[np.ndarray]) -> Tensor:
@@ -43,18 +47,18 @@ class SpotGazer(YOLO):
     def __init__(
         self,
         parking_lots: list[list[dict[str, Any]]],
-        model: str | Path = "spot_gazer_core/yolov8m_spot_gazer.pt",
-        task="detect",
+        model: str | Path = YOLOv8_PREDICTION_PARAMETERS["model"],  # type: ignore[assignment]
+        task=YOLOv8_PREDICTION_PARAMETERS["task"],
     ) -> None:
         super().__init__(model, task)
         # Manual predictor initialization
-        self.predictor = Interceptor(overrides=self.overrides, _callbacks=self.callbacks)
+        self.overrides = YOLOv8_PREDICTION_PARAMETERS
+        self.predictor = Interceptor(overrides=self.overrides, _callbacks=callbacks.get_default_callbacks())
         self.predictor.setup_model(model=model, verbose=False)
         # Initializing parking lots and gathering detection coroutines
         self.parking_lots = parking_lots
         self._gathered_tasks = asyncio.gather(
             *(self._detect_the_parking_lot_occupancy(parking_lot) for parking_lot in self.parking_lots),
-            return_exceptions=True,
         )
 
     async def start_detection(self) -> None:
@@ -75,16 +79,12 @@ class SpotGazer(YOLO):
             parking_zone = stream["parking_zone"]
             self.predictor.parking_zone = parking_zone
             results: Generator[None, None, Results] = self.predict(
-                source=stream["stream_source"], **YOLOv8_PREDICTION_PARAMETERS
+                source=stream["stream_source"], stream=True, **YOLOv8_PREDICTION_PARAMETERS
             )
 
             for result in results:
                 self.predictor.parking_zone = parking_zone
-                parking_occupancy = self._save_occupancy(
-                    stream["parking_lot_id"],
-                    len(result),  # type: ignore[arg-type]
-                )
-                print(parking_occupancy)
+                await self._save_occupancy(stream["parking_lot_id"], len(result))  # type: ignore[arg-type]
 
                 # Sleep for the specified processing rate before processing the next frame
                 await asyncio.sleep(stream["processing_rate"])
@@ -93,28 +93,25 @@ class SpotGazer(YOLO):
             while True:
                 for stream in parking_lot:
                     # Initialize predictor and run streams in the background (threads)
-                    stream["prediction"] = self.predict(source=stream["stream_source"], **YOLOv8_PREDICTION_PARAMETERS)
+                    stream["prediction"] = self.predict(
+                        source=stream["stream_source"], stream=True, **YOLOv8_PREDICTION_PARAMETERS
+                    )
                 detected_cars = count = 0
                 for stream in cycle(parking_lot):
                     self.predictor.parking_zone = stream["parking_zone"]
                     detected_cars += len(next(stream["prediction"]))
                     count += 1
                     if stream_count == count:
-                        parking_occupancy = self._save_occupancy(stream["parking_lot_id"], detected_cars)
-                        print(parking_occupancy)
+                        await self._save_occupancy(stream["parking_lot_id"], detected_cars)
                         detected_cars = count = 0
 
                         # Sleep for the specified processing rate before processing the next frame
                         await asyncio.sleep(stream["processing_rate"])
 
     @staticmethod
-    def _save_occupancy(parking_lot_id: int, occupied_spots: int) -> dict[str, Any]:
-        # TODO: save the data to the DB instead of returning
-        return {
-            "parking_lot_id": parking_lot_id,
-            "occupied_spots": occupied_spots,
-            "timestamp": now(TIME_ZONE).to_datetime_string(),
-        }
+    async def _save_occupancy(parking_lot_id: int, occupied_spots: int) -> None:
+        await Occupancy.objects.acreate(parking_lot_id=parking_lot_id, occupied_spots=occupied_spots)
+        logger.debug(f"Parking lot: {parking_lot_id}; occupied spots: {occupied_spots}.")
 
 
 if __name__ == "__main__":
