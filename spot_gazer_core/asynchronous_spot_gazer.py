@@ -1,17 +1,16 @@
 import asyncio
 from itertools import cycle
 from pathlib import Path
-from typing import Any, Generator, NoReturn
+from typing import Any, Generator
 
 import numpy as np
+from configs.settings import TIME_ZONE, YOLOv8_PREDICTION_PARAMETERS
 from pendulum import now
 from torch import Tensor
 from ultralytics import YOLO
 from ultralytics.yolo.engine.results import Results
 from ultralytics.yolo.utils import DEFAULT_CFG, SETTINGS
 from ultralytics.yolo.v8.detect import DetectionPredictor
-
-from configs.settings import TIME_ZONE, YOLOv8_PREDICTION_PARAMETERS
 from utils import create_mask, logging
 
 SETTINGS.update({"sync": False})  # Prevent sync analytics and crashes with Ultralytics HUB (Google Analytics)
@@ -42,7 +41,10 @@ class SpotGazer(YOLO):
     """
 
     def __init__(
-        self, parking_lots: list[list[dict[str, Any]]], model: str | Path = "yolov8m_spot_gazer.pt", task="detect"
+        self,
+        parking_lots: list[list[dict[str, Any]]],
+        model: str | Path = "spot_gazer_core/yolov8m_spot_gazer.pt",
+        task="detect",
     ) -> None:
         super().__init__(model, task)
         # Manual predictor initialization
@@ -58,13 +60,13 @@ class SpotGazer(YOLO):
     async def start_detection(self) -> None:
         """Start separate asynchronous tasks for each parking lot. One parking lot can have several camera streams"""
         logger.info(f"Occupancy detection of {len(self.parking_lots)} parking lots has been started!")
-        self._gathered_tasks = await self._gathered_tasks
+        self._gathered_tasks = await self._gathered_tasks  # type: ignore[assignment]
 
     def stop_detection(self) -> None:
         (task.cancel() for task in self._gathered_tasks)
         logger.info("Detection stopped!")
 
-    async def _detect_the_parking_lot_occupancy(self, parking_lot: list[dict[str, Any]]) -> NoReturn:
+    async def _detect_the_parking_lot_occupancy(self, parking_lot: list[dict[str, Any]]) -> None:
         logger.info(f"Determining the occupancy of parking lot №{(stream := parking_lot[0])['parking_lot_id']}")
         stream_count = len(parking_lot)
 
@@ -72,11 +74,16 @@ class SpotGazer(YOLO):
             # Set parking zone as a predictor class instance attribute which will be converted to a mask
             parking_zone = stream["parking_zone"]
             self.predictor.parking_zone = parking_zone
-            results: Generator[Results] = self.predict(source=stream["stream_source"], **YOLOv8_PREDICTION_PARAMETERS)
+            results: Generator[None, None, Results] = self.predict(
+                source=stream["stream_source"], **YOLOv8_PREDICTION_PARAMETERS
+            )
 
             for result in results:
                 self.predictor.parking_zone = parking_zone
-                parking_occupancy = self._save_occupancy(stream["parking_lot_id"], len(result))
+                parking_occupancy = self._save_occupancy(
+                    stream["parking_lot_id"],
+                    len(result),  # type: ignore[arg-type]
+                )
                 print(parking_occupancy)
 
                 # Sleep for the specified processing rate before processing the next frame
@@ -113,7 +120,7 @@ class SpotGazer(YOLO):
 if __name__ == "__main__":
     stream_1 = {
         "parking_lot_id": 1,
-        "stream_source": "test_media/parking_video_1.mp4",
+        "stream_source": "tests/test_media/parking_video_1.mp4",
         "processing_rate": 3,  # Process 1 frame every 3 seconds
         "parking_zone": [
             [[[0, 222]], [[633, 222]], [[635, 330]], [[3, 329]]],
@@ -123,7 +130,7 @@ if __name__ == "__main__":
     }
     stream_2 = {
         "parking_lot_id": 1,
-        "stream_source": "test_media/parking_video_2.mp4",
+        "stream_source": "tests/test_media/parking_video_2.mp4",
         "processing_rate": 5,
         "parking_zone": [
             [[[1, 256]], [[242, 76]], [[422, 117]], [[254, 288]], [[161, 359]], [[2, 308]]],
