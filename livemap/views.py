@@ -10,7 +10,7 @@ from livemap.models import ParkingLot
 
 
 @lru_cache()
-def extract_client_ip_address(request: WSGIRequest) -> str | None:
+def _extract_client_ip_address(request: WSGIRequest) -> str | None:
     req_headers = request.META
     x_forwarded_for_value = req_headers.get("HTTP_X_FORWARDED_FOR")
     if x_forwarded_for_value:
@@ -21,7 +21,7 @@ def extract_client_ip_address(request: WSGIRequest) -> str | None:
 
 
 @lru_cache()
-def fetch_geolocation(ip_address: str) -> tuple[float, float] | None:
+def _fetch_geolocation(ip_address: str) -> tuple[float, float] | None:
     response = requests.get(f"https://ipinfo.io/{ip_address}/json")
 
     if response.status_code == 200:
@@ -75,8 +75,8 @@ def index(request: WSGIRequest) -> HttpResponse:
     parkings = ParkingLot.objects.select_related("address", "address__city", "address__city__country").prefetch_related(
         "occupancies", "stream_sources"
     )
-    client_ip_address = extract_client_ip_address(request)
-    geolocation = fetch_geolocation(client_ip_address) if client_ip_address else None
+    client_ip_address = _extract_client_ip_address(request)
+    geolocation = _fetch_geolocation(client_ip_address) if client_ip_address else None
     folium_map = folium.Map(geolocation)
 
     for parking in parkings:
