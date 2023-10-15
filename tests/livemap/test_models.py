@@ -10,7 +10,7 @@ from faker import Faker
 fake = Faker()
 
 
-class TestData:
+class TestCaseWithData(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         # Set up data for the whole TestCase
@@ -25,9 +25,16 @@ class TestData:
             is_free=fake.random_element(ParkingLot.Answer.values),
             geolocation=[float(fake.latitude()), float(fake.longitude())],
         )
+        cls.stream_source_data = {
+            "parking_lot": cls.parking_lot,
+            "stream_source": "tests/test_media/parking_video_1.mp4",
+            "processing_rate": fake.pyint(min_value=1, max_value=5),
+            "is_active": True,
+        }
+        cls.stream_source = VideoStreamSource.objects.create(**cls.stream_source_data)
 
 
-class ParkingLotModelTest(TestData, TestCase):
+class ParkingLotModelTest(TestCaseWithData):
     def test_parking_lot_choices(self) -> None:
         self.assertTrue(self.parking_lot.get_is_private in ParkingLot.Answer.labels)
         self.assertTrue(self.parking_lot.get_is_free in ParkingLot.Answer.labels)
@@ -57,19 +64,11 @@ class ParkingLotModelTest(TestData, TestCase):
             validate_geolocation(input)
 
 
-class VideoStreamSourceTest(TestData, TestCase):
-    @classmethod
-    def setUpTestData(cls) -> None:
-        super().setUpTestData()
-        cls.parking_lot_data = {
-            "parking_lot": cls.parking_lot,
-            "stream_source": "tests/test_media/parking_video_1.mp4",
-            "processing_rate": 1,
-            "is_active": True,
-        }
-        VideoStreamSource.objects.create(**cls.parking_lot_data)
-
+class VideoStreamSourceTest(TestCaseWithData):
     def test_clean(self) -> None:
-        self.parking_lot_data["processing_rate"] = 2
-        with self.assertRaisesMessage(ValidationError, "The processing rate for this parking lot should be 1 s!"):
-            VideoStreamSource.objects.create(**self.parking_lot_data)
+        processing_rate = self.stream_source_data["processing_rate"]
+        self.stream_source_data["processing_rate"] = fake.pyint(min_value=6)
+        with self.assertRaisesMessage(
+            ValidationError, f"The processing rate for this parking lot should be {processing_rate} s!"
+        ):
+            VideoStreamSource.objects.create(**self.stream_source_data)
