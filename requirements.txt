@@ -7,3 +7,5 @@ ultralytics==8.0.118
 pre-commit==3.4.0
 folium==0.14.0
 python-dotenv==1.0.0
+faker==19.*
+parameterized-0.9.*

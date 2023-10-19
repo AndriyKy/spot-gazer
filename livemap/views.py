@@ -12,9 +12,8 @@ from livemap.models import ParkingLot
 @lru_cache()
 def _extract_client_ip_address(request: WSGIRequest) -> str | None:
     req_headers = request.META
-    x_forwarded_for_value = req_headers.get("HTTP_X_FORWARDED_FOR")
-    if x_forwarded_for_value:
-        ip_addr = x_forwarded_for_value.split(",")[-1].strip()
+    if x_forwarded_for_value := req_headers.get("HTTP_X_FORWARDED_FOR"):
+        ip_addr = x_forwarded_for_value.split(",")[0].strip()
     else:
         ip_addr = req_headers.get("REMOTE_ADDR")
     return ip_addr
@@ -33,7 +32,7 @@ def _fetch_geolocation(ip_address: str) -> tuple[float, float] | None:
     return None
 
 
-def _compose_html_table(parking: ParkingLot) -> folium.Popup:
+def _compose_html_table(parking: ParkingLot) -> str:
     parking_popup = {
         "Address": "<a href='https://www.google.com/maps/search/?api=1&query="
         f"{parking.geolocation[0]},{parking.geolocation[1]}'>{parking.address}</a>",
@@ -45,7 +44,7 @@ def _compose_html_table(parking: ParkingLot) -> folium.Popup:
         if parking.occupancies.exists()
         else "",
     }
-    table_html = f"""
+    html_table = f"""
     <table class="styled-table" style="width:100%">
         <thead>
             <tr>
@@ -59,16 +58,16 @@ def _compose_html_table(parking: ParkingLot) -> folium.Popup:
         </thead>
     """
     for field, value in parking_popup.items():
-        table_html += f"""
+        html_table += f"""
         <tr>
             <td>{field}</td>
             <td>{value}</td>
         </tr>
         """
-    table_html += """
+    html_table += """
     </table>
     """
-    return folium.Popup(table_html)
+    return html_table
 
 
 def index(request: WSGIRequest) -> HttpResponse:
@@ -81,6 +80,6 @@ def index(request: WSGIRequest) -> HttpResponse:
 
     for parking in parkings:
         popup = _compose_html_table(parking)
-        folium.Marker(parking.geolocation, popup).add_to(folium_map)
+        folium.Marker((39.0437, -77.4875), folium.Popup(popup)).add_to(folium_map)
 
     return render(request, "index.html", {"map": folium_map.get_root().render()})
