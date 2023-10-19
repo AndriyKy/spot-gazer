@@ -44,15 +44,16 @@ def _compose_html_table(parking: ParkingLot) -> str:
         if parking.occupancies.exists()
         else "",
     }
+    lives = "- Live "
+    for stream_source in parking.stream_sources.filter(parking_lot_id=parking.id):
+        lives += f"<a href='{stream_source.stream_source}'> 🔴 </a>"
+
     html_table = f"""
     <table class="styled-table" style="width:100%">
         <thead>
             <tr>
                 <th colspan="2">
-                    Parking details - Live
-                    <a href='{parking.stream_sources.get().stream_source if parking.stream_sources.exists() else "/"}'>
-                        🔴
-                    </a>
+                    Parking details {lives}
                 </th>
             </tr>
         </thead>
@@ -80,6 +81,6 @@ def index(request: WSGIRequest) -> HttpResponse:
 
     for parking in parkings:
         popup = _compose_html_table(parking)
-        folium.Marker((39.0437, -77.4875), folium.Popup(popup)).add_to(folium_map)
+        folium.Marker(parking.geolocation, folium.Popup(popup)).add_to(folium_map)
 
     return render(request, "index.html", {"map": folium_map.get_root().render()})
