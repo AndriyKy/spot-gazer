@@ -4,11 +4,7 @@ from parameterized import parameterized
 
 from livemap.models import ParkingLot, VideoStreamSource, validate_geolocation
 
-from faker import Faker
-
-from .. import TestCaseWithData
-
-fake = Faker()
+from .. import TestCaseWithData, fake
 
 
 class ParkingLotModelTest(TestCaseWithData):
