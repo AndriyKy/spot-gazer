@@ -69,6 +69,11 @@ class SpotGazer(YOLO):
         (task.cancel() for task in self._gathered_tasks)
         logger.info("Detection stopped!")
 
+    @staticmethod
+    async def _deactivate_stream(parking_lot_id: int) -> None:
+        await VideoStreamSource.objects.filter(parking_lot_id=parking_lot_id).aupdate(is_active=False)
+        logger.warning(f"Parking lot {parking_lot_id} is not active anymore.")
+
     async def _detect_the_parking_lot_occupancy(self, parking_lot: list[dict[str, Any]]) -> None:
         logger.info(f"Determining the occupancy of parking lot №{(stream := parking_lot[0])['parking_lot_id']}")
 
@@ -76,42 +81,43 @@ class SpotGazer(YOLO):
             # Set parking zone as a predictor class instance attribute which will be converted to a mask
             parking_zone = stream["parking_zone"]
             self.predictor.parking_zone = parking_zone
-            results: Generator[None, None, Results] = self.predict(
-                source=stream["stream_source"], stream=True, **YOLOv8_PREDICTION_PARAMETERS
-            )
-
             try:
+                results: Generator[None, None, Results] = self.predict(
+                    source=stream["stream_source"], stream=True, **YOLOv8_PREDICTION_PARAMETERS
+                )
                 for result in results:
                     self.predictor.parking_zone = parking_zone
                     await self._save_occupancy(stream["parking_lot_id"], len(result))  # type: ignore[arg-type]
 
                     # Sleep for the specified processing rate before processing the next frame
                     await asyncio.sleep(stream["processing_rate"])
-            except ConnectionError:
-                pass
-            await VideoStreamSource.objects.filter(parking_lot_id=stream["parking_lot_id"]).aupdate(is_active=False)
-            logger.warning(f"Parking lot {stream['parking_lot_id']} is not active anymore.")
+            except (ConnectionError, OSError) as error:
+                logger.error(error)
+            await self._deactivate_stream(stream["parking_lot_id"])
         else:
+            active_streams = []
             for stream in parking_lot:
-                # Initialize predictor
-                stream["prediction"] = self.predict(
-                    source=stream["stream_source"], stream=True, **YOLOv8_PREDICTION_PARAMETERS
-                )
+                try:
+                    # Initialize predictor
+                    stream["prediction"] = self.predict(
+                        source=stream["stream_source"], stream=True, **YOLOv8_PREDICTION_PARAMETERS
+                    )
+                except OSError:
+                    await self._deactivate_stream(stream["parking_lot_id"])
+                    continue
+                active_streams.append(stream)
 
             # Continuously process frames from the video streams
             while True:
                 detected_cars = count = 0
-                stream_count = len(parking_lot)
-                for stream in parking_lot:
+                stream_count = len(active_streams)
+                for stream in active_streams:
                     self.predictor.parking_zone = stream["parking_zone"]
                     try:
                         detected_cars += len(next(stream["prediction"]))
                     except (StopIteration, ConnectionError):
-                        await VideoStreamSource.objects.filter(parking_lot_id=stream["parking_lot_id"]).aupdate(
-                            is_active=False
-                        )
-                        parking_lot.remove(stream)
-                        logger.warning(f"Parking lot {stream['parking_lot_id']} is not active anymore.")
+                        await self._deactivate_stream(stream["parking_lot_id"])
+                        active_streams.remove(stream)
                         break
                     count += 1
                     if stream_count == count:
