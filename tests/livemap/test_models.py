@@ -9,8 +9,8 @@ from .. import TestCaseWithData, fake
 
 class ParkingLotModelTest(TestCaseWithData):
     def test_parking_lot_choices(self) -> None:
-        self.assertTrue(self.parking_lot.get_is_private in ParkingLot.Answer.labels)
-        self.assertTrue(self.parking_lot.get_is_free in ParkingLot.Answer.labels)
+        self.assertIn(self.parking_lot.get_is_private, ParkingLot.Answer.labels)
+        self.assertIn(self.parking_lot.get_is_free, ParkingLot.Answer.labels)
 
     @parameterized.expand(
         [
