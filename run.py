@@ -14,7 +14,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_core.settings")
 application = get_wsgi_application()
 
 
-def stream_sources() -> list[list[dict[str, Any]]]:
+def select_grouped_stream_sources() -> list[list[dict[str, Any]]]:
     stream_sources_list = list(
         VideoStreamSource.objects.filter(is_active=True).values(
             "parking_lot_id", "stream_source", "processing_rate", "parking_zone"
@@ -38,15 +38,16 @@ async def run_spot_gazer(stream_sources_list: list[list[dict[str, Any]]]) -> Non
         spot_gazer.stop_detection()
 
 
-try:
-    # Run Django server in the background
-    os.system("screen -dmSL django_session python3 ./manage.py runserver")
+if __name__ == "__main__":
+    try:
+        # Run Django server in the background
+        os.system("screen -dmSL django_session python3 ./manage.py runserver")
 
-    # Select all stream sources from the database and run Stop Gazer
-    stream_sources_list = stream_sources()
-    run(run_spot_gazer(stream_sources_list))
-except KeyboardInterrupt:
-    pass
-finally:
-    # Terminate the background Django session
-    os.system("screen -XS django_session quit")
+        # Select all stream sources from the database and run Stop Gazer
+        stream_sources_list = select_grouped_stream_sources()
+        run(run_spot_gazer(stream_sources_list))
+    except KeyboardInterrupt:
+        pass
+    finally:
+        # Terminate the background Django session
+        os.system("screen -XS django_session quit")
