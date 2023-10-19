@@ -36,10 +36,8 @@ class ViewsTest(TestCaseWithData):
             f"{self.parking_lot.geolocation[0]},{self.parking_lot.geolocation[1]}'>{self.parking_lot.address}</a>",
             html_table,
         )
-        self.assertIn(
-            f"<a href='{self.parking_lot.stream_sources.get().stream_source}'>",
-            html_table,
-        )
+        for stream_source in self.parking_lot.stream_sources.filter(parking_lot_id=self.parking_lot.pk):
+            self.assertIn(stream_source.stream_source, html_table)
 
     def test_index(self) -> None:
         response = self.client.get(reverse("livemap:index"))
