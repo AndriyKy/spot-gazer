@@ -1,5 +1,4 @@
 import asyncio
-from itertools import cycle
 from pathlib import Path
 from typing import Any, Generator
 
@@ -15,7 +14,7 @@ import django
 
 django.setup()
 
-from livemap.models import Occupancy  # noqa: E402
+from livemap.models import Occupancy, VideoStreamSource  # noqa: E402
 
 SETTINGS.update({"sync": False})  # Prevent sync analytics and crashes with Ultralytics HUB (Google Analytics)
 logger = logging.getLogger(__name__)
@@ -57,14 +56,14 @@ class SpotGazer(YOLO):
         self.predictor.setup_model(model=model, verbose=False)
         # Initializing parking lots and gathering detection coroutines
         self.parking_lots = parking_lots
-        self._gathered_tasks = asyncio.gather(
-            *(self._detect_the_parking_lot_occupancy(parking_lot) for parking_lot in self.parking_lots),
-        )
+        self._gathered_tasks = []
 
     async def start_detection(self) -> None:
         """Start separate asynchronous tasks for each parking lot. One parking lot can have several camera streams"""
         logger.info(f"Occupancy detection of {len(self.parking_lots)} parking lots has been started!")
-        self._gathered_tasks = await self._gathered_tasks  # type: ignore[assignment]
+        self._gathered_tasks = await asyncio.gather(
+            *(self._detect_the_parking_lot_occupancy(parking_lot) for parking_lot in self.parking_lots),
+        )
 
     def stop_detection(self) -> None:
         (task.cancel() for task in self._gathered_tasks)
@@ -72,9 +71,8 @@ class SpotGazer(YOLO):
 
     async def _detect_the_parking_lot_occupancy(self, parking_lot: list[dict[str, Any]]) -> None:
         logger.info(f"Determining the occupancy of parking lot №{(stream := parking_lot[0])['parking_lot_id']}")
-        stream_count = len(parking_lot)
 
-        if stream_count == 1:
+        if len(parking_lot) == 1:
             # Set parking zone as a predictor class instance attribute which will be converted to a mask
             parking_zone = stream["parking_zone"]
             self.predictor.parking_zone = parking_zone
@@ -82,24 +80,39 @@ class SpotGazer(YOLO):
                 source=stream["stream_source"], stream=True, **YOLOv8_PREDICTION_PARAMETERS
             )
 
-            for result in results:
-                self.predictor.parking_zone = parking_zone
-                await self._save_occupancy(stream["parking_lot_id"], len(result))  # type: ignore[arg-type]
+            try:
+                for result in results:
+                    self.predictor.parking_zone = parking_zone
+                    await self._save_occupancy(stream["parking_lot_id"], len(result))  # type: ignore[arg-type]
 
-                # Sleep for the specified processing rate before processing the next frame
-                await asyncio.sleep(stream["processing_rate"])
+                    # Sleep for the specified processing rate before processing the next frame
+                    await asyncio.sleep(stream["processing_rate"])
+            except ConnectionError:
+                pass
+            await VideoStreamSource.objects.filter(parking_lot_id=stream["parking_lot_id"]).aupdate(is_active=False)
+            logger.warning(f"Parking lot {stream['parking_lot_id']} is not active anymore.")
         else:
+            for stream in parking_lot:
+                # Initialize predictor
+                stream["prediction"] = self.predict(
+                    source=stream["stream_source"], stream=True, **YOLOv8_PREDICTION_PARAMETERS
+                )
+
             # Continuously process frames from the video streams
             while True:
-                for stream in parking_lot:
-                    # Initialize predictor and run streams in the background (threads)
-                    stream["prediction"] = self.predict(
-                        source=stream["stream_source"], stream=True, **YOLOv8_PREDICTION_PARAMETERS
-                    )
                 detected_cars = count = 0
-                for stream in cycle(parking_lot):
+                stream_count = len(parking_lot)
+                for stream in parking_lot:
                     self.predictor.parking_zone = stream["parking_zone"]
-                    detected_cars += len(next(stream["prediction"]))
+                    try:
+                        detected_cars += len(next(stream["prediction"]))
+                    except (StopIteration, ConnectionError):
+                        await VideoStreamSource.objects.filter(parking_lot_id=stream["parking_lot_id"]).aupdate(
+                            is_active=False
+                        )
+                        parking_lot.remove(stream)
+                        logger.warning(f"Parking lot {stream['parking_lot_id']} is not active anymore.")
+                        break
                     count += 1
                     if stream_count == count:
                         await self._save_occupancy(stream["parking_lot_id"], detected_cars)
@@ -107,55 +120,10 @@ class SpotGazer(YOLO):
 
                         # Sleep for the specified processing rate before processing the next frame
                         await asyncio.sleep(stream["processing_rate"])
+                if not stream_count:
+                    break
 
     @staticmethod
     async def _save_occupancy(parking_lot_id: int, occupied_spots: int) -> None:
         await Occupancy.objects.acreate(parking_lot_id=parking_lot_id, occupied_spots=occupied_spots)
         logger.debug(f"Parking lot: {parking_lot_id}; occupied spots: {occupied_spots}.")
-
-
-if __name__ == "__main__":
-    stream_1 = {
-        "parking_lot_id": 1,
-        "stream_source": "tests/test_media/parking_video_1.mp4",
-        "processing_rate": 3,  # Process 1 frame every 3 seconds
-        "parking_zone": [
-            [[[0, 222]], [[633, 222]], [[635, 330]], [[3, 329]]],
-            [[[9, 124]], [[637, 125]], [[633, 16]], [[352, 7]], [[7, 14]]],
-        ],
-        # "parking_zone": None,
-    }
-    stream_2 = {
-        "parking_lot_id": 1,
-        "stream_source": "tests/test_media/parking_video_2.mp4",
-        "processing_rate": 5,
-        "parking_zone": [
-            [[[1, 256]], [[242, 76]], [[422, 117]], [[254, 288]], [[161, 359]], [[2, 308]]],
-            [[[469, 134]], [[636, 162]], [[610, 357]], [[466, 357]], [[327, 329]]],
-            [[[1, 199]], [[207, 87]], [[89, 66]], [[1, 98]]],
-        ],
-        # "parking_zone": None,
-    }
-    stream_3 = {
-        "parking_lot_id": 3,
-        "stream_source": "https://youtu.be/mpwfjhmyEzw",
-        "processing_rate": 5,
-        "parking_zone": [
-            [[[46, 637]], [[544, 870]], [[1135, 1023]], [[1493, 1066]], [[1493, 838]], [[516, 689]], [[170, 576]]],
-            [[[1643, 833]], [[1530, 469]], [[1611, 464]], [[1850, 879]]],
-        ],
-        # "parking_zone": None,
-    }
-    video_stream_source = [[stream_1, stream_2]]
-
-    async def main() -> None:
-        spot_gazer = SpotGazer(video_stream_source)
-        try:
-            await spot_gazer.start_detection()
-        finally:
-            spot_gazer.stop_detection()
-
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        pass
