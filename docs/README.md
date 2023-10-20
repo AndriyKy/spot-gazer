@@ -13,17 +13,24 @@ Join us in creating a greener, smarter future of parking! 🌍 🌿
 ## Installation
 > **NOTE:** `Python 3` and the `venv` module must already be installed.
 
-To install the system on Linux (based on Debian distribution), run the following commands in the console:
+To install the system, run the following commands in the console:
 
 ```bash
 git clone https://github.com/AndriyKy/spot-gazer.git
 cd spot-gazer
 ```
 
-Create an `.env` file from [`.env.sample`](../.env.sample), set the necessary variables, and run [`build`](../build.sh):
+Create an `.env` file from [`.env.sample`](../.env.sample), set the necessary variables, and run [`build`](../build.sh) ( for Linux based on Debian):
 
 ```bash
 ./build.sh
+```
+
+Optionally, you can create a superuser and load test data:
+
+```bash
+python3 manage.py createsuperuser
+python3 manage.py loaddata test_data.json
 ```
 
 Then run SpotGazer:
