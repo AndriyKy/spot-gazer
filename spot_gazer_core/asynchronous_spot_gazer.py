@@ -3,13 +3,14 @@ from pathlib import Path
 from typing import Any, Generator
 
 import numpy as np
-from .settings import YOLOv8_PREDICTION_PARAMETERS
+from .configs.settings import YOLOv8_PREDICTION_PARAMETERS
 from torch import Tensor
 from ultralytics import YOLO
 from ultralytics.yolo.engine.results import Results
 from ultralytics.yolo.utils import SETTINGS, callbacks
 from ultralytics.yolo.v8.detect import DetectionPredictor
-from .utils import create_mask, logging
+from .image_processing import create_mask
+from .configs.logging_config import logging
 import django
 
 django.setup()

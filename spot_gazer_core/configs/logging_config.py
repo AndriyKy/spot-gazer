@@ -2,7 +2,7 @@ import logging
 
 from colorlog import ColoredFormatter
 
-from ..settings import CONSOLE_LOG_LEVEL, FILE_LOG_LEVEL
+from .settings import CONSOLE_LOG_LEVEL, FILE_LOG_LEVEL
 
 # Create a logger with the root logger's name
 logger = logging.getLogger()
