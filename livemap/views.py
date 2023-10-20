@@ -1,10 +1,10 @@
 from functools import lru_cache
 
 import folium
+import requests  # type: ignore[import]
+from django.core.handlers.wsgi import WSGIRequest
 from django.http import HttpResponse
 from django.shortcuts import render
-from django.core.handlers.wsgi import WSGIRequest
-import requests  # type: ignore[import]
 
 from livemap.models import ParkingLot
 
