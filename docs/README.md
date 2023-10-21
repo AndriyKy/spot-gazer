@@ -50,7 +50,7 @@ python3 -m run
 
 ## Contribution
 
-Contributions to the **SpotGazer** project are welcomed and greatly appreciated. Whether you're a developer, a designer, or a documentation enthusiast, there are many ways you can contribute to this open-source project. Here's how you can get involved:
+Contributions to the SpotGazer project are welcomed and greatly appreciated. Whether you're a developer, a designer, or a documentation enthusiast, there are many ways you can contribute to this open-source project. Here's how you can get involved:
 
 - 💻 **Code Contributions:** If you're a developer, you can contribute to the project by working on new features, fixing bugs, or improving the codebase. To get started, fork the repository, make your changes, and submit a pull request.
 
@@ -64,4 +64,4 @@ Contributions to the **SpotGazer** project are welcomed and greatly appreciated.
 
 - 🌐 **Localization:** If you're proficient in multiple languages, you can contribute by translating the project to make it more accessible to a wider audience.
 
-We look forward to your contributions and are excited to build this project together. Let's make **SpotGazer** even better with your help! 🚀
+We look forward to your contributions and are excited to build this project together. Let's make SpotGazer even better with your help! 🚀
