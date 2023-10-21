@@ -13,7 +13,7 @@ Join us in creating a greener, smarter future of parking! 🌍 🌿
 ## Installation
 > **NOTE:** `Python 3` and the `venv` module must already be installed.
 
-To install the system, run the following commands in the console:
+To install the system, run the following commands in the Linux terminal:
 
 ```bash
 git clone https://github.com/AndriyKy/spot-gazer.git
