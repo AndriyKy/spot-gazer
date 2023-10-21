@@ -17,4 +17,4 @@ python3 manage.py migrate
 
 echo
 echo "[INFO] Run tests."
-python3 -Wa manage.py test tests
+python3 manage.py test tests
