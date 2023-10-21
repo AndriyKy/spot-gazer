@@ -1,0 +1,637 @@
+[
+  {
+    "model": "livemap.country",
+    "pk": 1,
+    "fields": {
+      "country_name": "United States"
+    }
+  },
+  {
+    "model": "livemap.country",
+    "pk": 2,
+    "fields": {
+      "country_name": "Canad"
+    }
+  },
+  {
+    "model": "livemap.country",
+    "pk": 3,
+    "fields": {
+      "country_name": "Czech Republic"
+    }
+  },
+  {
+    "model": "livemap.country",
+    "pk": 4,
+    "fields": {
+      "country_name": "New Caledonia"
+    }
+  },
+  {
+    "model": "livemap.country",
+    "pk": 5,
+    "fields": {
+      "country_name": "Korea"
+    }
+  },
+  {
+    "model": "livemap.city",
+    "pk": 1,
+    "fields": {
+      "country": 1,
+      "city_name": "Staunton"
+    }
+  },
+  {
+    "model": "livemap.city",
+    "pk": 2,
+    "fields": {
+      "country": 1,
+      "city_name": "Brighton"
+    }
+  },
+  {
+    "model": "livemap.city",
+    "pk": 3,
+    "fields": {
+      "country": 2,
+      "city_name": "Collingwood"
+    }
+  },
+  {
+    "model": "livemap.city",
+    "pk": 4,
+    "fields": {
+      "country": 3,
+      "city_name": "Lanškroun"
+    }
+  },
+  {
+    "model": "livemap.city",
+    "pk": 5,
+    "fields": {
+      "country": 3,
+      "city_name": "Lomnice nad Popelka"
+    }
+  },
+  {
+    "model": "livemap.city",
+    "pk": 6,
+    "fields": {
+      "country": 3,
+      "city_name": "Turnov"
+    }
+  },
+  {
+    "model": "livemap.city",
+    "pk": 7,
+    "fields": {
+      "country": 3,
+      "city_name": "Kroměříž"
+    }
+  },
+  {
+    "model": "livemap.city",
+    "pk": 8,
+    "fields": {
+      "country": 3,
+      "city_name": "Holešov"
+    }
+  },
+  {
+    "model": "livemap.city",
+    "pk": 9,
+    "fields": {
+      "country": 2,
+      "city_name": "Surrey"
+    }
+  },
+  {
+    "model": "livemap.city",
+    "pk": 10,
+    "fields": {
+      "country": 1,
+      "city_name": "Corvallis"
+    }
+  },
+  {
+    "model": "livemap.address",
+    "pk": 1,
+    "fields": {
+      "city": 1,
+      "parking_lot_address": "The Driginia Building, 23 N Central Ave"
+    }
+  },
+  {
+    "model": "livemap.address",
+    "pk": 2,
+    "fields": {
+      "city": 2,
+      "parking_lot_address": "8379-8381 Mary Lake Ln"
+    }
+  },
+  {
+    "model": "livemap.address",
+    "pk": 3,
+    "fields": {
+      "city": 3,
+      "parking_lot_address": "97 Hurontario St"
+    }
+  },
+  {
+    "model": "livemap.address",
+    "pk": 4,
+    "fields": {
+      "city": 4,
+      "parking_lot_address": "Municipal office Lanškroun"
+    }
+  },
+  {
+    "model": "livemap.address",
+    "pk": 5,
+    "fields": {
+      "city": 5,
+      "parking_lot_address": "Hus's monument"
+    }
+  },
+  {
+    "model": "livemap.address",
+    "pk": 6,
+    "fields": {
+      "city": 6,
+      "parking_lot_address": "Bohemian Paradise Square"
+    }
+  },
+  {
+    "model": "livemap.address",
+    "pk": 7,
+    "fields": {
+      "city": 7,
+      "parking_lot_address": "Hanacke Square"
+    }
+  },
+  {
+    "model": "livemap.address",
+    "pk": 8,
+    "fields": {
+      "city": 8,
+      "parking_lot_address": "Fontána Holešov"
+    }
+  },
+  {
+    "model": "livemap.address",
+    "pk": 9,
+    "fields": {
+      "city": 9,
+      "parking_lot_address": "120 176 St #101"
+    }
+  },
+  {
+    "model": "livemap.address",
+    "pk": 10,
+    "fields": {
+      "city": 10,
+      "parking_lot_address": "Tebeau Hall, 1351 SW Washington Ave"
+    }
+  },
+  {
+    "model": "livemap.parkinglot",
+    "pk": 1,
+    "fields": {
+      "address": 1,
+      "total_spots": 18,
+      "spots_for_disabled": 0,
+      "is_private": 0,
+      "is_free": 0,
+      "geolocation": [
+        38.1502804,
+        -79.073553
+      ]
+    }
+  },
+  {
+    "model": "livemap.parkinglot",
+    "pk": 2,
+    "fields": {
+      "address": 2,
+      "total_spots": 80,
+      "spots_for_disabled": null,
+      "is_private": 0,
+      "is_free": 1,
+      "geolocation": [
+        40.598166,
+        -111.5829
+      ]
+    }
+  },
+  {
+    "model": "livemap.parkinglot",
+    "pk": 3,
+    "fields": {
+      "address": 3,
+      "total_spots": 32,
+      "spots_for_disabled": null,
+      "is_private": 0,
+      "is_free": 1,
+      "geolocation": [
+        44.500284,
+        -80.216432
+      ]
+    }
+  },
+  {
+    "model": "livemap.parkinglot",
+    "pk": 4,
+    "fields": {
+      "address": 4,
+      "total_spots": 72,
+      "spots_for_disabled": null,
+      "is_private": 0,
+      "is_free": 0,
+      "geolocation": [
+        49.912078,
+        16.611533
+      ]
+    }
+  },
+  {
+    "model": "livemap.parkinglot",
+    "pk": 5,
+    "fields": {
+      "address": 5,
+      "total_spots": 44,
+      "spots_for_disabled": null,
+      "is_private": 0,
+      "is_free": 1,
+      "geolocation": [
+        50.531309,
+        15.372369
+      ]
+    }
+  },
+  {
+    "model": "livemap.parkinglot",
+    "pk": 6,
+    "fields": {
+      "address": 6,
+      "total_spots": 35,
+      "spots_for_disabled": null,
+      "is_private": 0,
+      "is_free": 0,
+      "geolocation": [
+        50.587421,
+        15.157351
+      ]
+    }
+  },
+  {
+    "model": "livemap.parkinglot",
+    "pk": 7,
+    "fields": {
+      "address": 7,
+      "total_spots": 12,
+      "spots_for_disabled": null,
+      "is_private": 0,
+      "is_free": 1,
+      "geolocation": [
+        49.293559,
+        17.390054
+      ]
+    }
+  },
+  {
+    "model": "livemap.parkinglot",
+    "pk": 8,
+    "fields": {
+      "address": 8,
+      "total_spots": 12,
+      "spots_for_disabled": null,
+      "is_private": 0,
+      "is_free": 1,
+      "geolocation": [
+        49.333321,
+        17.578163
+      ]
+    }
+  },
+  {
+    "model": "livemap.parkinglot",
+    "pk": 9,
+    "fields": {
+      "address": 9,
+      "total_spots": 19,
+      "spots_for_disabled": null,
+      "is_private": 1,
+      "is_free": 1,
+      "geolocation": [
+        49.004346,
+        -122.735065
+      ]
+    }
+  },
+  {
+    "model": "livemap.parkinglot",
+    "pk": 10,
+    "fields": {
+      "address": 10,
+      "total_spots": 160,
+      "spots_for_disabled": null,
+      "is_private": 0,
+      "is_free": 1,
+      "geolocation": [
+        44.563067,
+        -123.273677
+      ]
+    }
+  },
+  {
+    "model": "livemap.videostreamsource",
+    "pk": 1,
+    "fields": {
+      "parking_lot": 1,
+      "stream_source": "https://www.youtube.com/watch?v=LcSaBafrb-w&ab_channel=LingoNetworks",
+      "processing_rate": 3,
+      "parking_zone": null,
+      "is_active": true
+    }
+  },
+  {
+    "model": "livemap.videostreamsource",
+    "pk": 2,
+    "fields": {
+      "parking_lot": 3,
+      "stream_source": "https://www.youtube.com/watch?v=EPKWu223XEg&ab_channel=TownofCollingwood",
+      "processing_rate": 5,
+      "parking_zone": null,
+      "is_active": true
+    }
+  },
+  {
+    "model": "livemap.videostreamsource",
+    "pk": 3,
+    "fields": {
+      "parking_lot": 2,
+      "stream_source": "https://www.youtube.com/watch?v=iq-CT8UQzgo&ab_channel=BrightonResor",
+      "processing_rate": 10,
+      "parking_zone": null,
+      "is_active": true
+    }
+  },
+  {
+    "model": "livemap.videostreamsource",
+    "pk": 4,
+    "fields": {
+      "parking_lot": 4,
+      "stream_source": "https://www.youtube.com/watch?v=mpwfjhmyEzw&ab_channel=NordicTelecomLan%C5%A1kroun",
+      "processing_rate": 5,
+      "parking_zone": null,
+      "is_active": true
+    }
+  },
+  {
+    "model": "livemap.videostreamsource",
+    "pk": 5,
+    "fields": {
+      "parking_lot": 5,
+      "stream_source": "https://www.youtube.com/watch?v=gdz-CEWA0cw&ab_channel=FreeLomwebkamer",
+      "processing_rate": 5,
+      "parking_zone": null,
+      "is_active": true
+    }
+  },
+  {
+    "model": "livemap.videostreamsource",
+    "pk": 6,
+    "fields": {
+      "parking_lot": 6,
+      "stream_source": "https://www.youtube.com/watch?v=rOxE2Q6kOxE&ab_channel=PAMICOCZECH%2Cs.r.o.",
+      "processing_rate": 3,
+      "parking_zone": null,
+      "is_active": true
+    }
+  },
+  {
+    "model": "livemap.videostreamsource",
+    "pk": 7,
+    "fields": {
+      "parking_lot": 7,
+      "stream_source": "https://www.youtube.com/watch?v=-90Gh2mFFGU",
+      "processing_rate": 10,
+      "parking_zone": null,
+      "is_active": true
+    }
+  },
+  {
+    "model": "livemap.videostreamsource",
+    "pk": 8,
+    "fields": {
+      "parking_lot": 8,
+      "stream_source": "https://www.youtube.com/watch?v=n-DQMYLoPco&ab_channel=www.zlin.cz",
+      "processing_rate": 3,
+      "parking_zone": null,
+      "is_active": true
+    }
+  },
+  {
+    "model": "livemap.videostreamsource",
+    "pk": 9,
+    "fields": {
+      "parking_lot": 9,
+      "stream_source": "https://www.youtube.com/watch?v=HBDD3j5so0g&ab_channel=BorderBuddyCustomsBrokers",
+      "processing_rate": 15,
+      "parking_zone": null,
+      "is_active": true
+    }
+  },
+  {
+    "model": "livemap.videostreamsource",
+    "pk": 10,
+    "fields": {
+      "parking_lot": 10,
+      "stream_source": "https://www.youtube.com/watch?v=e9LYewJGQlk&ab_channel=OregonStateUniversity-Liv",
+      "processing_rate": 15,
+      "parking_zone": null,
+      "is_active": true
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 1,
+    "fields": {
+      "parking_lot": 10,
+      "occupied_spots": 0,
+      "timestamp": "2023-10-12T13:48:58.827Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 2,
+    "fields": {
+      "parking_lot": 1,
+      "occupied_spots": 6,
+      "timestamp": "2023-10-12T13:48:59.023Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 3,
+    "fields": {
+      "parking_lot": 3,
+      "occupied_spots": 15,
+      "timestamp": "2023-10-12T13:51:07.531Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 4,
+    "fields": {
+      "parking_lot": 2,
+      "occupied_spots": 0,
+      "timestamp": "2023-10-12T13:51:07.699Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 5,
+    "fields": {
+      "parking_lot": 4,
+      "occupied_spots": 50,
+      "timestamp": "2023-10-12T13:51:07.765Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 6,
+    "fields": {
+      "parking_lot": 5,
+      "occupied_spots": 26,
+      "timestamp": "2023-10-12T13:51:07.832Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 7,
+    "fields": {
+      "parking_lot": 6,
+      "occupied_spots": 26,
+      "timestamp": "2023-10-12T13:51:07.898Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 8,
+    "fields": {
+      "parking_lot": 8,
+      "occupied_spots": 12,
+      "timestamp": "2023-10-12T13:51:07.965Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 9,
+    "fields": {
+      "parking_lot": 7,
+      "occupied_spots": 17,
+      "timestamp": "2023-10-12T13:51:08.042Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 10,
+    "fields": {
+      "parking_lot": 1,
+      "occupied_spots": 7,
+      "timestamp": "2023-10-12T13:51:08.109Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 11,
+    "fields": {
+      "parking_lot": 9,
+      "occupied_spots": 5,
+      "timestamp": "2023-10-12T13:51:08.176Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 12,
+    "fields": {
+      "parking_lot": 3,
+      "occupied_spots": 13,
+      "timestamp": "2023-10-12T13:51:08.243Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 13,
+    "fields": {
+      "parking_lot": 10,
+      "occupied_spots": 0,
+      "timestamp": "2023-10-12T13:51:08.309Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 14,
+    "fields": {
+      "parking_lot": 4,
+      "occupied_spots": 60,
+      "timestamp": "2023-10-12T13:51:08.376Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 15,
+    "fields": {
+      "parking_lot": 5,
+      "occupied_spots": 24,
+      "timestamp": "2023-10-12T13:51:08.443Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 16,
+    "fields": {
+      "parking_lot": 2,
+      "occupied_spots": 0,
+      "timestamp": "2023-10-12T13:51:08.510Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 17,
+    "fields": {
+      "parking_lot": 6,
+      "occupied_spots": 24,
+      "timestamp": "2023-10-12T13:51:08.576Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 18,
+    "fields": {
+      "parking_lot": 8,
+      "occupied_spots": 13,
+      "timestamp": "2023-10-12T13:51:08.642Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 19,
+    "fields": {
+      "parking_lot": 1,
+      "occupied_spots": 7,
+      "timestamp": "2023-10-12T13:51:08.709Z"
+    }
+  },
+  {
+    "model": "livemap.occupancy",
+    "pk": 20,
+    "fields": {
+      "parking_lot": 7,
+      "occupied_spots": 16,
+      "timestamp": "2023-10-12T13:51:09.117Z"
+    }
+  }
+]
