@@ -20,7 +20,7 @@ git clone https://github.com/AndriyKy/spot-gazer.git
 cd spot-gazer
 ```
 
-Create an `.env` file from [`.env.sample`](../.env.sample), set the necessary variables, and run [`build`](../build.sh) ( for Linux based on Debian):
+Create an `.env` file from [`.env.sample`](../.env.sample), set the necessary variables, and run [`build`](../build.sh) (for Linux based on Debian):
 
 ```bash
 ./build.sh
